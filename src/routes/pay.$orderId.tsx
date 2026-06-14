@@ -3,7 +3,7 @@ import { useQuery, useMutation, queryOptions } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
-import { getOrder, checkPayment } from "@/lib/api/orders.functions";
+import { getOrder, checkPayment, type OrderDTO } from "@/lib/api/orders.functions";
 
 const orderQuery = (id: string) =>
   queryOptions({
@@ -72,7 +72,7 @@ function PendingState({
   onCheck,
   checking,
 }: {
-  order: NonNullable<ReturnType<typeof useQuery<typeof orderQuery>>["data"]>;
+  order: OrderDTO;
   onCheck: () => void;
   checking: boolean;
 }) {
