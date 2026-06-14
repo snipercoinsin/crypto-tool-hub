@@ -14,7 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      orders: {
+        Row: {
+          created_at: string
+          crypto_amount: number
+          currency: string
+          deposit_address: string
+          download_token: string
+          email: string
+          expires_at: string
+          id: string
+          paid_at: string | null
+          paid_txid: string | null
+          price_usd: number
+          status: string
+          tool_id: string
+        }
+        Insert: {
+          created_at?: string
+          crypto_amount: number
+          currency: string
+          deposit_address: string
+          download_token?: string
+          email: string
+          expires_at?: string
+          id?: string
+          paid_at?: string | null
+          paid_txid?: string | null
+          price_usd: number
+          status?: string
+          tool_id: string
+        }
+        Update: {
+          created_at?: string
+          crypto_amount?: number
+          currency?: string
+          deposit_address?: string
+          download_token?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          paid_at?: string | null
+          paid_txid?: string | null
+          price_usd?: number
+          status?: string
+          tool_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      tools: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          name: string
+          price_usd: number
+          video_url: string | null
+          youtube_url: string | null
+          zip_path: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          name: string
+          price_usd: number
+          video_url?: string | null
+          youtube_url?: string | null
+          zip_path: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          price_usd?: number
+          video_url?: string | null
+          youtube_url?: string | null
+          zip_path?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
