@@ -9,38 +9,101 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AdminX7k9q2m3p8RouteImport } from './routes/admin-x7k9q2m3p8'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PayOrderIdRouteImport } from './routes/pay.$orderId'
+import { Route as DownloadOrderIdRouteImport } from './routes/download.$orderId'
+import { Route as AdminX7k9q2m3p8DashboardRouteImport } from './routes/admin-x7k9q2m3p8.dashboard'
 
+const AdminX7k9q2m3p8Route = AdminX7k9q2m3p8RouteImport.update({
+  id: '/admin-x7k9q2m3p8',
+  path: '/admin-x7k9q2m3p8',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PayOrderIdRoute = PayOrderIdRouteImport.update({
+  id: '/pay/$orderId',
+  path: '/pay/$orderId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DownloadOrderIdRoute = DownloadOrderIdRouteImport.update({
+  id: '/download/$orderId',
+  path: '/download/$orderId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminX7k9q2m3p8DashboardRoute =
+  AdminX7k9q2m3p8DashboardRouteImport.update({
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AdminX7k9q2m3p8Route,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin-x7k9q2m3p8': typeof AdminX7k9q2m3p8RouteWithChildren
+  '/admin-x7k9q2m3p8/dashboard': typeof AdminX7k9q2m3p8DashboardRoute
+  '/download/$orderId': typeof DownloadOrderIdRoute
+  '/pay/$orderId': typeof PayOrderIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin-x7k9q2m3p8': typeof AdminX7k9q2m3p8RouteWithChildren
+  '/admin-x7k9q2m3p8/dashboard': typeof AdminX7k9q2m3p8DashboardRoute
+  '/download/$orderId': typeof DownloadOrderIdRoute
+  '/pay/$orderId': typeof PayOrderIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin-x7k9q2m3p8': typeof AdminX7k9q2m3p8RouteWithChildren
+  '/admin-x7k9q2m3p8/dashboard': typeof AdminX7k9q2m3p8DashboardRoute
+  '/download/$orderId': typeof DownloadOrderIdRoute
+  '/pay/$orderId': typeof PayOrderIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin-x7k9q2m3p8'
+    | '/admin-x7k9q2m3p8/dashboard'
+    | '/download/$orderId'
+    | '/pay/$orderId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin-x7k9q2m3p8'
+    | '/admin-x7k9q2m3p8/dashboard'
+    | '/download/$orderId'
+    | '/pay/$orderId'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin-x7k9q2m3p8'
+    | '/admin-x7k9q2m3p8/dashboard'
+    | '/download/$orderId'
+    | '/pay/$orderId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminX7k9q2m3p8Route: typeof AdminX7k9q2m3p8RouteWithChildren
+  DownloadOrderIdRoute: typeof DownloadOrderIdRoute
+  PayOrderIdRoute: typeof PayOrderIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/admin-x7k9q2m3p8': {
+      id: '/admin-x7k9q2m3p8'
+      path: '/admin-x7k9q2m3p8'
+      fullPath: '/admin-x7k9q2m3p8'
+      preLoaderRoute: typeof AdminX7k9q2m3p8RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +111,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pay/$orderId': {
+      id: '/pay/$orderId'
+      path: '/pay/$orderId'
+      fullPath: '/pay/$orderId'
+      preLoaderRoute: typeof PayOrderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/download/$orderId': {
+      id: '/download/$orderId'
+      path: '/download/$orderId'
+      fullPath: '/download/$orderId'
+      preLoaderRoute: typeof DownloadOrderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-x7k9q2m3p8/dashboard': {
+      id: '/admin-x7k9q2m3p8/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin-x7k9q2m3p8/dashboard'
+      preLoaderRoute: typeof AdminX7k9q2m3p8DashboardRouteImport
+      parentRoute: typeof AdminX7k9q2m3p8Route
+    }
   }
 }
 
+interface AdminX7k9q2m3p8RouteChildren {
+  AdminX7k9q2m3p8DashboardRoute: typeof AdminX7k9q2m3p8DashboardRoute
+}
+
+const AdminX7k9q2m3p8RouteChildren: AdminX7k9q2m3p8RouteChildren = {
+  AdminX7k9q2m3p8DashboardRoute: AdminX7k9q2m3p8DashboardRoute,
+}
+
+const AdminX7k9q2m3p8RouteWithChildren = AdminX7k9q2m3p8Route._addFileChildren(
+  AdminX7k9q2m3p8RouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminX7k9q2m3p8Route: AdminX7k9q2m3p8RouteWithChildren,
+  DownloadOrderIdRoute: DownloadOrderIdRoute,
+  PayOrderIdRoute: PayOrderIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
