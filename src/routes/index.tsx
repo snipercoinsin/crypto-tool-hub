@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { User, Users } from "lucide-react";
 import { listTools } from "@/lib/api/storefront.functions";
 import { ToolCard } from "@/components/ToolCard";
+import hikasoLogo from "@/assets/hikaso-logo.jpg.asset.json";
 
 const toolsQuery = queryOptions({
   queryKey: ["tools"],
@@ -31,13 +33,36 @@ function Storefront() {
   return (
     <div className="hero-bg min-h-screen">
       <header className="border-b border-border/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-5">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-lg bg-[color:var(--primary)]" />
+            <img
+              src={hikasoLogo.url}
+              alt="Hikaso"
+              className="h-10 w-10 rounded-lg object-cover ring-1 ring-border"
+            />
             <span className="text-lg font-semibold tracking-tight">Hikaso</span>
           </div>
-          <nav className="text-sm text-muted-foreground">
-            <a href="#tools" className="hover:text-foreground">Catalog</a>
+          <nav className="flex items-center gap-2 text-sm">
+            <a
+              href="https://t.me/Hikas0"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Telegram account"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1.5 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+            >
+              <User className="h-4 w-4" />
+              @Hikas0
+            </a>
+            <a
+              href="https://t.me/free_Tools_Hacking"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Telegram group"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1.5 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+            >
+              <Users className="h-4 w-4" />
+              @free_Tools_Hacking
+            </a>
           </nav>
         </div>
       </header>
