@@ -39,7 +39,7 @@ export const createOrder = createServerFn({ method: "POST" })
       .from("settings")
       .select("key,value")
       .in("key", ["btc_address", "xmr_address"]);
-    if (sErr) throw new Error(sErr.message);
+    if (sErr) { console.error("[createOrder settings]", sErr); throw new Error("Service temporarily unavailable"); }
     const map = Object.fromEntries((setting ?? []).map((r) => [r.key, r.value]));
     const address = data.currency === "BTC" ? map.btc_address : map.xmr_address;
     if (!address) throw new Error(`No ${data.currency} receiving address configured.`);
@@ -62,7 +62,7 @@ export const createOrder = createServerFn({ method: "POST" })
       })
       .select("*")
       .single();
-    if (oErr || !order) throw new Error(oErr?.message ?? "Could not create order");
+    if (oErr || !order) { console.error("[createOrder insert]", oErr); throw new Error("Could not create order"); }
 
     return {
       id: order.id,
