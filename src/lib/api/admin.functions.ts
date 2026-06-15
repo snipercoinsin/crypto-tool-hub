@@ -6,7 +6,7 @@ export const adminLogin = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ password: z.string().min(1).max(200) }).parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminPassword, getAdminSession } = await import("@/lib/admin.server");
-    if (!verifyAdminPassword(data.password)) {
+    if (!(await verifyAdminPassword(data.password))) {
       // Slow down brute force a bit
       await new Promise((r) => setTimeout(r, 700));
       throw new Error("Invalid password");
@@ -97,19 +97,19 @@ export const adminGetUploadUrls = createServerFn({ method: "POST" })
     if (data.imageName) {
       const p = pathFor(data.imageName);
       const { data: s, error } = await supabaseAdmin.storage.from("tool-images").createSignedUploadUrl(p);
-      if (error || !s) throw new Error(error?.message ?? "image upload url failed");
+      if (error || !s) { console.error("[upload image url]", error); throw new Error("Image upload URL failed"); }
       out.image = { path: p, token: s.token };
     }
     if (data.videoName) {
       const p = pathFor(data.videoName);
       const { data: s, error } = await supabaseAdmin.storage.from("tool-videos").createSignedUploadUrl(p);
-      if (error || !s) throw new Error(error?.message ?? "video upload url failed");
+      if (error || !s) { console.error("[upload video url]", error); throw new Error("Video upload URL failed"); }
       out.video = { path: p, token: s.token };
     }
     {
       const p = pathFor(data.zipName);
       const { data: s, error } = await supabaseAdmin.storage.from("tool-zips").createSignedUploadUrl(p);
-      if (error || !s) throw new Error(error?.message ?? "zip upload url failed");
+      if (error || !s) { console.error("[upload zip url]", error); throw new Error("Zip upload URL failed"); }
       out.zip = { path: p, token: s.token };
     }
     return out;
@@ -140,7 +140,7 @@ export const adminCreateTool = createServerFn({ method: "POST" })
       youtube_url: data.youtube_url ?? null,
       zip_path: data.zip_path,
     });
-    if (error) throw new Error(error.message);
+    if (error) { console.error("[adminCreateTool]", error); throw new Error("Could not create tool"); }
     return { ok: true };
   });
 
@@ -187,6 +187,6 @@ export const adminConfirmOrder = createServerFn({ method: "POST" })
       .from("orders")
       .update({ status: "paid", paid_at: new Date().toISOString(), paid_txid: "manual" })
       .eq("id", data.id);
-    if (error) throw new Error(error.message);
+    if (error) { console.error("[adminConfirmOrder]", error); throw new Error("Could not confirm order"); }
     return { ok: true };
   });

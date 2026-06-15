@@ -1,27 +1,55 @@
-// Server-only admin helpers: session, password verification, settings.
-import { useSession, getCookie, setCookie } from "@tanstack/react-start/server";
-import { createHash } from "node:crypto";
+// Server-only admin helpers: session, password verification.
+import { useSession } from "@tanstack/react-start/server";
 
-// SHA-256 of "HikasoSniper00336#"
-const ADMIN_PASSWORD_HASH =
-  "015ece0f4ffdbd5e325f904b41e39c7e5f55d6dc7cd19df4d0b7426b38be9c55";
+// PBKDF2-SHA256 derived hash of the admin password.
+// Salt and iterations are public; only the password itself is the secret.
+// To rotate: pick a new password, compute pbkdf2(pw, SALT, ITERATIONS, 32, 'sha-256')
+// and replace ADMIN_PASSWORD_HASH. Optionally override via ADMIN_PASSWORD_HASH env var.
+const SALT = "hikaso-admin-v1";
+const ITERATIONS = 200_000;
+const ADMIN_PASSWORD_HASH_DEFAULT =
+  "88e4298370398feadb7115a2c6d0368fb72f78a19b4f822d006bbf2e01f6d0dd";
 
-export function hashPassword(pw: string): string {
-  return createHash("sha256").update(pw).digest("hex");
+function expectedHash(): string {
+  return (process.env.ADMIN_PASSWORD_HASH || ADMIN_PASSWORD_HASH_DEFAULT).toLowerCase();
 }
 
-export function verifyAdminPassword(pw: string): boolean {
-  const h = hashPassword(pw);
-  // timing-ish safe compare
-  if (h.length !== ADMIN_PASSWORD_HASH.length) return false;
+function toHex(buf: ArrayBuffer): string {
+  const b = new Uint8Array(buf);
+  let s = "";
+  for (let i = 0; i < b.length; i++) s += b[i].toString(16).padStart(2, "0");
+  return s;
+}
+
+export async function hashPassword(pw: string): Promise<string> {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    enc.encode(pw),
+    { name: "PBKDF2" },
+    false,
+    ["deriveBits"],
+  );
+  const bits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt: enc.encode(SALT), iterations: ITERATIONS, hash: "SHA-256" },
+    key,
+    256,
+  );
+  return toHex(bits);
+}
+
+export async function verifyAdminPassword(pw: string): Promise<boolean> {
+  const h = await hashPassword(pw);
+  const expected = expectedHash();
+  if (h.length !== expected.length) return false;
   let diff = 0;
-  for (let i = 0; i < h.length; i++) diff |= h.charCodeAt(i) ^ ADMIN_PASSWORD_HASH.charCodeAt(i);
+  for (let i = 0; i < h.length; i++) diff |= h.charCodeAt(i) ^ expected.charCodeAt(i);
   return diff === 0;
 }
 
 function sessionPassword(): string {
   const k = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!k || k.length < 32) throw new Error("Server misconfigured: missing session key source");
+  if (!k || k.length < 32) throw new Error("Server misconfigured");
   return k;
 }
 
