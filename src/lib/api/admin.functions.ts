@@ -188,5 +188,7 @@ export const adminConfirmOrder = createServerFn({ method: "POST" })
       .update({ status: "paid", paid_at: new Date().toISOString(), paid_txid: "manual" })
       .eq("id", data.id);
     if (error) { console.error("[adminConfirmOrder]", error); throw new Error("Could not confirm order"); }
+    const { deliverPaidOrderEmail } = await import("@/lib/email/send.server");
+    await deliverPaidOrderEmail(data.id);
     return { ok: true };
   });
