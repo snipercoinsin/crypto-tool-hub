@@ -133,6 +133,8 @@ export const checkPayment = createServerFn({ method: "POST" })
             .from("orders")
             .update({ status: "paid", paid_at: new Date().toISOString(), paid_txid: r.txid })
             .eq("id", o.id);
+          const { deliverPaidOrderEmail } = await import("@/lib/email/send.server");
+          await deliverPaidOrderEmail(o.id);
           return { status: "paid", downloadToken: o.download_token };
         }
       } catch (e) {

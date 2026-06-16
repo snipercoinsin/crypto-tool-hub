@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
   adminMe,
-  adminLogout,
   adminListTools,
   adminListOrders,
   adminGetSettings,
@@ -16,6 +15,7 @@ import {
   adminDeleteTool,
   adminConfirmOrder,
 } from "@/lib/api/admin.functions";
+import { AdminNav } from "@/components/AdminNav";
 
 export const Route = createFileRoute("/admin-x7k9q2m3p8/dashboard")({
   head: () => ({ meta: [{ title: "Admin" }, { name: "robots", content: "noindex, nofollow" }] }),
@@ -25,7 +25,6 @@ export const Route = createFileRoute("/admin-x7k9q2m3p8/dashboard")({
 function Dashboard() {
   const me = useServerFn(adminMe);
   const navigate = useNavigate();
-  const logout = useServerFn(adminLogout);
 
   const meQ = useQuery({ queryKey: ["adminMe"], queryFn: () => me() });
 
@@ -35,21 +34,9 @@ function Dashboard() {
     return null;
   }
 
-  async function doLogout() {
-    await logout();
-    navigate({ to: "/admin-x7k9q2m3p8" });
-  }
-
   return (
     <div className="hero-bg min-h-screen">
-      <header className="border-b border-border/60">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <h1 className="text-lg font-semibold">Admin · Hikaso</h1>
-          <button onClick={doLogout} className="text-sm text-muted-foreground hover:text-foreground">
-            Sign out
-          </button>
-        </div>
-      </header>
+      <AdminNav />
 
       <main className="mx-auto max-w-6xl space-y-10 px-6 py-10">
         <SettingsCard />
