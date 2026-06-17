@@ -6,7 +6,9 @@ export const adminLogin = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ password: z.string().min(1).max(200) }).parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminPassword, getAdminSession } = await import("@/lib/admin.server");
-    if (!(await verifyAdminPassword(data.password))) {
+    // Tolerate accidental surrounding whitespace from copy/paste or mobile keyboards
+    const pw = data.password.trim();
+    if (!(await verifyAdminPassword(pw))) {
       // Slow down brute force a bit
       await new Promise((r) => setTimeout(r, 700));
       throw new Error("Invalid password");
