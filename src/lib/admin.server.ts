@@ -6,9 +6,9 @@ import { useSession } from "@tanstack/react-start/server";
 // To rotate: pick a new password, compute pbkdf2(pw, SALT, ITERATIONS, 32, 'sha-256')
 // and replace ADMIN_PASSWORD_HASH. Optionally override via ADMIN_PASSWORD_HASH env var.
 const SALT = "hikaso-admin-v1";
-const ITERATIONS = 200_000;
+const ITERATIONS = 100_000; // Cloudflare Workers caps PBKDF2 at 100k
 const ADMIN_PASSWORD_HASH_DEFAULT =
-  "88e4298370398feadb7115a2c6d0368fb72f78a19b4f822d006bbf2e01f6d0dd";
+  "92dd096351727a6104e7729b60be18dfb98ce118854b2e3da86a1a14a89457d0";
 
 function expectedHash(): string {
   return (process.env.ADMIN_PASSWORD_HASH || ADMIN_PASSWORD_HASH_DEFAULT).toLowerCase();
