@@ -216,11 +216,12 @@ export const adminListOrders = createServerFn({ method: "GET" }).handler(async (
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("orders")
-    .select("id,email,currency,price_usd,crypto_amount,deposit_address,status,created_at,expires_at,paid_txid,tools(name)")
+    .select("id,email,currency,price_usd,crypto_amount,deposit_address,status,created_at,expires_at,paid_txid,ip_address,country_code,tools(name)")
     .order("created_at", { ascending: false })
     .limit(200);
   return data ?? [];
 });
+
 
 export const adminConfirmOrder = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
@@ -237,3 +238,28 @@ export const adminConfirmOrder = createServerFn({ method: "POST" })
     await deliverPaidOrderEmail(data.id);
     return { ok: true };
   });
+
+export const adminDeleteOrder = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const { requireAdmin } = await import("@/lib/admin.server");
+    await requireAdmin();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("orders").delete().eq("id", data.id);
+    if (error) { console.error("[adminDeleteOrder]", error); throw new Error("Could not delete order"); }
+    return { ok: true };
+  });
+
+export const adminListEmails = createServerFn({ method: "GET" }).handler(async () => {
+  const { requireAdmin } = await import("@/lib/admin.server");
+  await requireAdmin();
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("orders")
+    .select("email,ip_address,country_code,status,created_at,tools(name)")
+    .order("created_at", { ascending: false })
+    .limit(1000);
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
+
