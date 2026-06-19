@@ -1,6 +1,7 @@
 // Buyer-facing order server functions. No auth required.
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, getRequestHeader } from "@tanstack/react-start";
 import { z } from "zod";
+
 
 const createSchema = z.object({
   toolId: z.string().uuid(),
