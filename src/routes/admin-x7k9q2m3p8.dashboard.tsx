@@ -14,10 +14,12 @@ import {
   adminCreateTool,
   adminDeleteTool,
   adminConfirmOrder,
+  adminDeleteOrder,
   adminListCategories,
   adminCreateCategory,
   adminDeleteCategory,
 } from "@/lib/api/admin.functions";
+
 import { AdminNav } from "@/components/AdminNav";
 
 
