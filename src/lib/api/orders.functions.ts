@@ -53,6 +53,16 @@ export const createOrder = createServerFn({ method: "POST" })
       ? Math.ceil(cryptoAmount * 1e8) / 1e8
       : Math.ceil(cryptoAmount * 1e12) / 1e12;
 
+    const ip =
+      getRequestHeader("cf-connecting-ip") ||
+      getRequestHeader("x-real-ip") ||
+      getRequestIP({ xForwardedFor: true }) ||
+      null;
+    const country =
+      getRequestHeader("cf-ipcountry") ||
+      getRequestHeader("x-vercel-ip-country") ||
+      null;
+
     const { data: order, error: oErr } = await supabaseAdmin
       .from("orders")
       .insert({
@@ -62,7 +72,10 @@ export const createOrder = createServerFn({ method: "POST" })
         price_usd: tool.price_usd,
         crypto_amount: rounded,
         deposit_address: address,
+        ip_address: ip,
+        country_code: country,
       })
+
       .select("*")
       .single();
     if (oErr || !order) { console.error("[createOrder insert]", oErr); throw new Error("Could not create order"); }
