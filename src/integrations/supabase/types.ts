@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
@@ -90,6 +111,7 @@ export type Database = {
       }
       tools: {
         Row: {
+          category_id: string | null
           created_at: string
           description: string
           id: string
@@ -101,6 +123,7 @@ export type Database = {
           zip_path: string
         }
         Insert: {
+          category_id?: string | null
           created_at?: string
           description?: string
           id?: string
@@ -112,6 +135,7 @@ export type Database = {
           zip_path: string
         }
         Update: {
+          category_id?: string | null
           created_at?: string
           description?: string
           id?: string
@@ -122,7 +146,15 @@ export type Database = {
           youtube_url?: string | null
           zip_path?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tools_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
