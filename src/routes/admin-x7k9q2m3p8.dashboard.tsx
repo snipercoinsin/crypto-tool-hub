@@ -342,6 +342,7 @@ function ToolsCard() {
 function OrdersCard() {
   const list = useServerFn(adminListOrders);
   const confirmO = useServerFn(adminConfirmOrder);
+  const delO = useServerFn(adminDeleteOrder);
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["adminOrders"], queryFn: () => list(), refetchInterval: 15000 });
   const m = useMutation({
@@ -349,6 +350,15 @@ function OrdersCard() {
     onSuccess: () => {
       toast.success("Marked paid");
       qc.invalidateQueries({ queryKey: ["adminOrders"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const dm = useMutation({
+    mutationFn: (id: string) => delO({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Order deleted");
+      qc.invalidateQueries({ queryKey: ["adminOrders"] });
+      qc.invalidateQueries({ queryKey: ["adminEmails"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -388,14 +398,22 @@ function OrdersCard() {
                     {new Date(o.created_at).toLocaleString()}
                   </td>
                   <td className="py-2 text-right">
-                    {o.status === "pending" && (
+                    <div className="flex justify-end gap-2">
+                      {o.status === "pending" && (
+                        <button
+                          onClick={() => m.mutate(o.id)}
+                          className="rounded-lg border border-border px-3 py-1 text-xs hover:bg-accent"
+                        >
+                          Mark paid
+                        </button>
+                      )}
                       <button
-                        onClick={() => m.mutate(o.id)}
-                        className="rounded-lg border border-border px-3 py-1 text-xs hover:bg-accent"
+                        onClick={() => confirm("Delete this order? This cannot be undone.") && dm.mutate(o.id)}
+                        className="rounded-lg border border-border px-3 py-1 text-xs text-[color:var(--destructive)] hover:bg-accent"
                       >
-                        Mark paid
+                        Delete
                       </button>
-                    )}
+                    </div>
                   </td>
                 </tr>
               );
@@ -407,6 +425,7 @@ function OrdersCard() {
     </section>
   );
 }
+
 
 function StatusPill({ s }: { s: string }) {
   const cls =
