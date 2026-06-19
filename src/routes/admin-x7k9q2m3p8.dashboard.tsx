@@ -184,15 +184,19 @@ function SettingsCard() {
 function NewToolCard() {
   const getUrls = useServerFn(adminGetUploadUrls);
   const createTool = useServerFn(adminCreateTool);
+  const listCats = useServerFn(adminListCategories);
   const qc = useQueryClient();
+  const catsQ = useQuery({ queryKey: ["adminCategories"], queryFn: () => listCats() });
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [price, setPrice] = useState("");
   const [yt, setYt] = useState("");
+  const [categoryId, setCategoryId] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [video, setVideo] = useState<File | null>(null);
   const [zip, setZip] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+
 
   async function uploadTo(bucket: string, path: string, token: string, file: File) {
     const { error } = await supabase.storage.from(bucket).uploadToSignedUrl(path, token, file);
@@ -227,13 +231,16 @@ function NewToolCard() {
           video_path: urls.video?.path ?? null,
           youtube_url: yt || null,
           zip_path: urls.zip.path,
+          category_id: categoryId || null,
         },
       });
       toast.success("Tool added");
-      setName(""); setDesc(""); setPrice(""); setYt("");
+      setName(""); setDesc(""); setPrice(""); setYt(""); setCategoryId("");
       setImage(null); setVideo(null); setZip(null);
       qc.invalidateQueries({ queryKey: ["adminTools"] });
+      qc.invalidateQueries({ queryKey: ["tools"] });
       (e.target as HTMLFormElement).reset();
+
     } catch (err) {
       toast.error((err as Error).message);
     } finally {
@@ -247,6 +254,19 @@ function NewToolCard() {
       <form onSubmit={submit} className="mt-4 grid gap-4 md:grid-cols-2">
         <Field label="Name" value={name} onChange={setName} />
         <Field label="Price (USD)" value={price} onChange={setPrice} type="number" step="0.01" />
+        <label className="block md:col-span-2">
+          <span className="mb-1 block text-xs uppercase tracking-wider text-muted-foreground">Category</span>
+          <select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            className="w-full rounded-xl border border-border bg-[color:var(--input)] px-3 py-2.5 outline-none focus:ring-2 focus:ring-[color:var(--ring)]"
+          >
+            <option value="">— Uncategorized —</option>
+            {(catsQ.data ?? []).map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </label>
         <Field
           label="Description"
           value={desc}
@@ -260,6 +280,7 @@ function NewToolCard() {
           onChange={setYt}
           className="md:col-span-2"
         />
+
         <FileField label="Cover image" accept="image/*" onChange={setImage} />
         <FileField label="Video file (optional)" accept="video/*" onChange={setVideo} />
         <FileField label="Tool .zip (required)" accept=".zip,application/zip" onChange={setZip} required />
