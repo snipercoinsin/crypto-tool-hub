@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { User, Users, Megaphone } from "lucide-react";
-import { listTools } from "@/lib/api/storefront.functions";
+import { listTools, listCategories } from "@/lib/api/storefront.functions";
 import { ToolCard } from "@/components/ToolCard";
 import { siteSettingsQuery } from "@/routes/__root";
 import hikasoLogo from "@/assets/hikaso-logo.jpg.asset.json";
@@ -11,19 +12,37 @@ const toolsQuery = queryOptions({
   queryFn: () => listTools(),
 });
 
+const categoriesQuery = queryOptions({
+  queryKey: ["categories"],
+  queryFn: () => listCategories(),
+});
+
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(toolsQuery),
+  loader: ({ context }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(toolsQuery),
+      context.queryClient.ensureQueryData(categoriesQuery),
+    ]),
   component: Storefront,
 });
 
+
 function Storefront() {
   const { data: tools } = useSuspenseQuery(toolsQuery);
+  const { data: categories } = useSuspenseQuery(categoriesQuery);
   const { data: site } = useSuspenseQuery(siteSettingsQuery);
+  const [activeCat, setActiveCat] = useState<string | "all">("all");
+
+  const visibleTools = useMemo(
+    () => (activeCat === "all" ? tools : tools.filter((t) => t.category_id === activeCat)),
+    [tools, activeCat],
+  );
 
   const logoSrc = site.logoUrl || hikasoLogo.url;
   const showFullBg = site.bgPlacement === "full" && site.bgImageUrl;
   const showTopBg = site.bgPlacement === "top" && site.bgImageUrl;
   const showBottomBg = site.bgPlacement === "bottom" && site.bgImageUrl;
+
 
   return (
     <div
@@ -130,13 +149,43 @@ function Storefront() {
         </section>
 
         <section id="tools" className="mx-auto max-w-6xl px-6 pb-24">
-          {tools.length === 0 ? (
+          {categories.length > 0 && (
+            <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
+              <button
+                onClick={() => setActiveCat("all")}
+                className={`rounded-full border px-4 py-1.5 text-sm transition ${
+                  activeCat === "all"
+                    ? "border-[color:var(--primary)] bg-[color:var(--primary)]/15 text-[color:var(--primary)]"
+                    : "border-border bg-card/60 text-muted-foreground hover:bg-accent hover:text-foreground"
+                }`}
+              >
+                All
+              </button>
+              {categories.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setActiveCat(c.id)}
+                  className={`rounded-full border px-4 py-1.5 text-sm transition ${
+                    activeCat === c.id
+                      ? "border-[color:var(--primary)] bg-[color:var(--primary)]/15 text-[color:var(--primary)]"
+                      : "border-border bg-card/60 text-muted-foreground hover:bg-accent hover:text-foreground"
+                  }`}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {visibleTools.length === 0 ? (
             <div className="card-elev rounded-2xl p-16 text-center text-muted-foreground">
-              No tools available yet. Check back soon.
+              {tools.length === 0
+                ? "No tools available yet. Check back soon."
+                : "No tools in this category yet."}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {tools.map((t) => (
+              {visibleTools.map((t) => (
                 <ToolCard key={t.id} tool={t} />
               ))}
             </div>
@@ -150,3 +199,4 @@ function Storefront() {
     </div>
   );
 }
+
