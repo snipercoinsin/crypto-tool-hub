@@ -37,6 +37,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          country_code: string | null
           created_at: string
           crypto_amount: number
           currency: string
@@ -45,6 +46,7 @@ export type Database = {
           email: string
           expires_at: string
           id: string
+          ip_address: string | null
           paid_at: string | null
           paid_txid: string | null
           price_usd: number
@@ -52,6 +54,7 @@ export type Database = {
           tool_id: string
         }
         Insert: {
+          country_code?: string | null
           created_at?: string
           crypto_amount: number
           currency: string
@@ -60,6 +63,7 @@ export type Database = {
           email: string
           expires_at?: string
           id?: string
+          ip_address?: string | null
           paid_at?: string | null
           paid_txid?: string | null
           price_usd: number
@@ -67,6 +71,7 @@ export type Database = {
           tool_id: string
         }
         Update: {
+          country_code?: string | null
           created_at?: string
           crypto_amount?: number
           currency?: string
@@ -75,6 +80,7 @@ export type Database = {
           email?: string
           expires_at?: string
           id?: string
+          ip_address?: string | null
           paid_at?: string | null
           paid_txid?: string | null
           price_usd?: number
