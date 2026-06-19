@@ -29,6 +29,10 @@ export function AdminNav() {
           <Link to="/admin-x7k9q2m3p8/email" className={linkCls} activeProps={{ className: `${linkCls} ${activeCls}` }}>
             Email
           </Link>
+          <Link to="/admin-x7k9q2m3p8/emails" className={linkCls} activeProps={{ className: `${linkCls} ${activeCls}` }}>
+            Customers
+          </Link>
+
         </div>
         <button onClick={doLogout} className="text-sm text-muted-foreground hover:text-foreground">
           Sign out

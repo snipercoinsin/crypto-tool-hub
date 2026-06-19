@@ -13,6 +13,7 @@ import { Route as AdminX7k9q2m3p8RouteImport } from './routes/admin-x7k9q2m3p8'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PayOrderIdRouteImport } from './routes/pay.$orderId'
 import { Route as DownloadOrderIdRouteImport } from './routes/download.$orderId'
+import { Route as AdminX7k9q2m3p8EmailsRouteImport } from './routes/admin-x7k9q2m3p8.emails'
 import { Route as AdminX7k9q2m3p8EmailRouteImport } from './routes/admin-x7k9q2m3p8.email'
 import { Route as AdminX7k9q2m3p8DashboardRouteImport } from './routes/admin-x7k9q2m3p8.dashboard'
 import { Route as AdminX7k9q2m3p8CustomizationRouteImport } from './routes/admin-x7k9q2m3p8.customization'
@@ -36,6 +37,11 @@ const DownloadOrderIdRoute = DownloadOrderIdRouteImport.update({
   id: '/download/$orderId',
   path: '/download/$orderId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminX7k9q2m3p8EmailsRoute = AdminX7k9q2m3p8EmailsRouteImport.update({
+  id: '/emails',
+  path: '/emails',
+  getParentRoute: () => AdminX7k9q2m3p8Route,
 } as any)
 const AdminX7k9q2m3p8EmailRoute = AdminX7k9q2m3p8EmailRouteImport.update({
   id: '/email',
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/admin-x7k9q2m3p8/customization': typeof AdminX7k9q2m3p8CustomizationRoute
   '/admin-x7k9q2m3p8/dashboard': typeof AdminX7k9q2m3p8DashboardRoute
   '/admin-x7k9q2m3p8/email': typeof AdminX7k9q2m3p8EmailRoute
+  '/admin-x7k9q2m3p8/emails': typeof AdminX7k9q2m3p8EmailsRoute
   '/download/$orderId': typeof DownloadOrderIdRoute
   '/pay/$orderId': typeof PayOrderIdRoute
 }
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/admin-x7k9q2m3p8/customization': typeof AdminX7k9q2m3p8CustomizationRoute
   '/admin-x7k9q2m3p8/dashboard': typeof AdminX7k9q2m3p8DashboardRoute
   '/admin-x7k9q2m3p8/email': typeof AdminX7k9q2m3p8EmailRoute
+  '/admin-x7k9q2m3p8/emails': typeof AdminX7k9q2m3p8EmailsRoute
   '/download/$orderId': typeof DownloadOrderIdRoute
   '/pay/$orderId': typeof PayOrderIdRoute
 }
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/admin-x7k9q2m3p8/customization': typeof AdminX7k9q2m3p8CustomizationRoute
   '/admin-x7k9q2m3p8/dashboard': typeof AdminX7k9q2m3p8DashboardRoute
   '/admin-x7k9q2m3p8/email': typeof AdminX7k9q2m3p8EmailRoute
+  '/admin-x7k9q2m3p8/emails': typeof AdminX7k9q2m3p8EmailsRoute
   '/download/$orderId': typeof DownloadOrderIdRoute
   '/pay/$orderId': typeof PayOrderIdRoute
 }
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/admin-x7k9q2m3p8/customization'
     | '/admin-x7k9q2m3p8/dashboard'
     | '/admin-x7k9q2m3p8/email'
+    | '/admin-x7k9q2m3p8/emails'
     | '/download/$orderId'
     | '/pay/$orderId'
   fileRoutesByTo: FileRoutesByTo
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/admin-x7k9q2m3p8/customization'
     | '/admin-x7k9q2m3p8/dashboard'
     | '/admin-x7k9q2m3p8/email'
+    | '/admin-x7k9q2m3p8/emails'
     | '/download/$orderId'
     | '/pay/$orderId'
   id:
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/admin-x7k9q2m3p8/customization'
     | '/admin-x7k9q2m3p8/dashboard'
     | '/admin-x7k9q2m3p8/email'
+    | '/admin-x7k9q2m3p8/emails'
     | '/download/$orderId'
     | '/pay/$orderId'
   fileRoutesById: FileRoutesById
@@ -150,6 +162,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DownloadOrderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-x7k9q2m3p8/emails': {
+      id: '/admin-x7k9q2m3p8/emails'
+      path: '/emails'
+      fullPath: '/admin-x7k9q2m3p8/emails'
+      preLoaderRoute: typeof AdminX7k9q2m3p8EmailsRouteImport
+      parentRoute: typeof AdminX7k9q2m3p8Route
+    }
     '/admin-x7k9q2m3p8/email': {
       id: '/admin-x7k9q2m3p8/email'
       path: '/email'
@@ -178,12 +197,14 @@ interface AdminX7k9q2m3p8RouteChildren {
   AdminX7k9q2m3p8CustomizationRoute: typeof AdminX7k9q2m3p8CustomizationRoute
   AdminX7k9q2m3p8DashboardRoute: typeof AdminX7k9q2m3p8DashboardRoute
   AdminX7k9q2m3p8EmailRoute: typeof AdminX7k9q2m3p8EmailRoute
+  AdminX7k9q2m3p8EmailsRoute: typeof AdminX7k9q2m3p8EmailsRoute
 }
 
 const AdminX7k9q2m3p8RouteChildren: AdminX7k9q2m3p8RouteChildren = {
   AdminX7k9q2m3p8CustomizationRoute: AdminX7k9q2m3p8CustomizationRoute,
   AdminX7k9q2m3p8DashboardRoute: AdminX7k9q2m3p8DashboardRoute,
   AdminX7k9q2m3p8EmailRoute: AdminX7k9q2m3p8EmailRoute,
+  AdminX7k9q2m3p8EmailsRoute: AdminX7k9q2m3p8EmailsRoute,
 }
 
 const AdminX7k9q2m3p8RouteWithChildren = AdminX7k9q2m3p8Route._addFileChildren(
