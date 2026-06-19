@@ -14,8 +14,12 @@ import {
   adminCreateTool,
   adminDeleteTool,
   adminConfirmOrder,
+  adminListCategories,
+  adminCreateCategory,
+  adminDeleteCategory,
 } from "@/lib/api/admin.functions";
 import { AdminNav } from "@/components/AdminNav";
+
 
 export const Route = createFileRoute("/admin-x7k9q2m3p8/dashboard")({
   head: () => ({ meta: [{ title: "Admin" }, { name: "robots", content: "noindex, nofollow" }] }),
@@ -40,6 +44,7 @@ function Dashboard() {
 
       <main className="mx-auto max-w-6xl space-y-10 px-6 py-10">
         <SettingsCard />
+        <CategoriesCard />
         <NewToolCard />
         <ToolsCard />
         <OrdersCard />
@@ -47,6 +52,89 @@ function Dashboard() {
     </div>
   );
 }
+
+function CategoriesCard() {
+  const list = useServerFn(adminListCategories);
+  const create = useServerFn(adminCreateCategory);
+  const del = useServerFn(adminDeleteCategory);
+  const qc = useQueryClient();
+  const q = useQuery({ queryKey: ["adminCategories"], queryFn: () => list() });
+  const [name, setName] = useState("");
+  const [order, setOrder] = useState("0");
+
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: ["adminCategories"] });
+    qc.invalidateQueries({ queryKey: ["categories"] });
+    qc.invalidateQueries({ queryKey: ["tools"] });
+  };
+
+  const addM = useMutation({
+    mutationFn: () => create({ data: { name, sort_order: Number(order) || 0 } }),
+    onSuccess: () => {
+      toast.success("Category added");
+      setName("");
+      setOrder("0");
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const delM = useMutation({
+    mutationFn: (id: string) => del({ data: { id } }),
+    onSuccess: () => {
+      toast.success("Category deleted");
+      invalidate();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <section className="card-elev rounded-2xl p-6">
+      <h2 className="text-lg font-semibold">Categories</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Group tools so buyers can filter by category on the storefront.
+      </p>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!name.trim()) return;
+          addM.mutate();
+        }}
+        className="mt-4 flex flex-wrap items-end gap-3"
+      >
+        <Field label="Name" value={name} onChange={setName} className="flex-1 min-w-[200px]" />
+        <Field label="Sort order" value={order} onChange={setOrder} type="number" className="w-32" />
+        <button
+          type="submit"
+          disabled={addM.isPending}
+          className="rounded-xl bg-[color:var(--primary)] px-4 py-2.5 font-semibold text-[color:var(--primary-foreground)] disabled:opacity-60"
+        >
+          {addM.isPending ? "Adding…" : "Add category"}
+        </button>
+      </form>
+
+      <div className="mt-6 divide-y divide-border">
+        {(q.data ?? []).map((c) => (
+          <div key={c.id} className="flex items-center justify-between py-3">
+            <div>
+              <div className="font-medium">{c.name}</div>
+              <div className="text-xs text-muted-foreground">Sort: {c.sort_order}</div>
+            </div>
+            <button
+              onClick={() => confirm(`Delete category "${c.name}"? Tools in it will become uncategorized.`) && delM.mutate(c.id)}
+              className="rounded-lg border border-border px-3 py-1.5 text-sm text-[color:var(--destructive)] hover:bg-accent"
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+        {q.data?.length === 0 && <p className="text-sm text-muted-foreground">No categories yet.</p>}
+      </div>
+    </section>
+  );
+}
+
 
 function SettingsCard() {
   const get = useServerFn(adminGetSettings);
