@@ -125,6 +125,7 @@ const createToolSchema = z.object({
   video_path: z.string().nullable().optional(),
   youtube_url: z.string().url().max(500).nullable().optional(),
   zip_path: z.string().min(1).max(500),
+  category_id: z.string().uuid().nullable().optional(),
 });
 
 export const adminCreateTool = createServerFn({ method: "POST" })
@@ -141,10 +142,52 @@ export const adminCreateTool = createServerFn({ method: "POST" })
       video_url: data.video_path ?? null,
       youtube_url: data.youtube_url ?? null,
       zip_path: data.zip_path,
+      category_id: data.category_id ?? null,
     });
     if (error) { console.error("[adminCreateTool]", error); throw new Error("Could not create tool"); }
     return { ok: true };
   });
+
+// Categories
+export const adminListCategories = createServerFn({ method: "GET" }).handler(async () => {
+  const { requireAdmin } = await import("@/lib/admin.server");
+  await requireAdmin();
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("categories")
+    .select("id,name,sort_order")
+    .order("sort_order", { ascending: true })
+    .order("name", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
+
+export const adminCreateCategory = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z.object({ name: z.string().min(1).max(100), sort_order: z.number().int().min(0).max(9999).default(0) }).parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { requireAdmin } = await import("@/lib/admin.server");
+    await requireAdmin();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("categories")
+      .insert({ name: data.name.trim(), sort_order: data.sort_order });
+    if (error) { console.error("[adminCreateCategory]", error); throw new Error(error.message || "Could not create category"); }
+    return { ok: true };
+  });
+
+export const adminDeleteCategory = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data }) => {
+    const { requireAdmin } = await import("@/lib/admin.server");
+    await requireAdmin();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("categories").delete().eq("id", data.id);
+    if (error) { console.error("[adminDeleteCategory]", error); throw new Error("Could not delete category"); }
+    return { ok: true };
+  });
+
 
 export const adminDeleteTool = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
