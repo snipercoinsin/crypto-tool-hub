@@ -216,11 +216,12 @@ export const adminListOrders = createServerFn({ method: "GET" }).handler(async (
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("orders")
-    .select("id,email,currency,price_usd,crypto_amount,deposit_address,status,created_at,expires_at,paid_txid,tools(name)")
+    .select("id,email,currency,price_usd,crypto_amount,deposit_address,status,created_at,expires_at,paid_txid,ip_address,country_code,tools(name)")
     .order("created_at", { ascending: false })
     .limit(200);
   return data ?? [];
 });
+
 
 export const adminConfirmOrder = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
